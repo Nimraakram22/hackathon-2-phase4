@@ -1,0 +1,75 @@
+🎉 Todo Chatbot has been deployed successfully!
+
+Release Name: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+📦 Deployed Components:
+- Frontend: {{ .Values.frontend.replicas }} replica(s)
+- Backend: {{ .Values.backend.replicas }} replica(s)
+{{- if .Values.backend.persistence.enabled }}
+- Persistent Storage: {{ .Values.backend.persistence.size }} (SQLite session database)
+{{- end }}
+
+🔍 To check the status of your deployment:
+
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl get services -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+🌐 To access the application:
+
+{{- if eq .Values.frontend.service.type "LoadBalancer" }}
+  # Get the frontend URL (Minikube):
+  minikube service {{ include "todo-chatbot.fullname" . }}-frontend --url
+
+  # Or use port-forward:
+  kubectl port-forward -n {{ .Release.Namespace }} service/{{ include "todo-chatbot.fullname" . }}-frontend 8080:{{ .Values.frontend.service.port }}
+  # Then open: http://localhost:8080
+{{- else if eq .Values.frontend.service.type "NodePort" }}
+  # Get the NodePort:
+  export NODE_PORT=$(kubectl get -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "todo-chatbot.fullname" . }}-frontend)
+  export NODE_IP=$(kubectl get nodes -n {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "Frontend URL: http://$NODE_IP:$NODE_PORT"
+{{- else }}
+  # Use port-forward to access the frontend:
+  kubectl port-forward -n {{ .Release.Namespace }} service/{{ include "todo-chatbot.fullname" . }}-frontend 8080:{{ .Values.frontend.service.port }}
+  # Then open: http://localhost:8080
+{{- end }}
+
+🔧 To access the backend API:
+
+  kubectl port-forward -n {{ .Release.Namespace }} service/{{ include "todo-chatbot.fullname" . }}-backend 8000:{{ .Values.backend.service.port }}
+  # Then access: http://localhost:8000/docs (API documentation)
+
+📊 To view logs:
+
+  # Frontend logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=frontend -f
+
+  # Backend logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=backend -f
+
+🔄 To update the deployment:
+
+  helm upgrade {{ .Release.Name }} ./helm/todo-chatbot -n {{ .Release.Namespace }}
+
+🗑️  To uninstall:
+
+  helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+⚠️  Important Notes:
+
+{{- if not .Values.secret.databaseUrl }}
+  - ⚠️  DATABASE_URL secret is empty. Create it manually:
+    kubectl create secret generic {{ include "todo-chatbot.fullname" . }}-secret \
+      --from-literal=DATABASE_URL='postgresql://user:pass@host:5432/db' \
+      --from-literal=OPENAI_API_KEY='sk-...' \
+      --from-literal=NEON_API_KEY='neon-key' \
+      -n {{ .Release.Namespace }} --dry-run=client -o yaml | kubectl apply -f -
+{{- end }}
+
+{{- if .Values.backend.persistence.enabled }}
+  - 💾 SQLite session database is persisted in PVC: {{ include "todo-chatbot.fullname" . }}-backend-data
+  - To verify persistence: kubectl get pvc -n {{ .Release.Namespace }}
+{{- end }}
+
+📚 For more information, visit: https://github.com/example/todo-chatbot

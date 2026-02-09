@@ -1,0 +1,152 @@
+/* Signup Page Styles */
+
+.signup {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-primary);
+  padding: var(--spacing-4);
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.card {
+  padding: var(--spacing-8);
+  background-color: var(--color-bg-secondary);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.title {
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.passwordStrength {
+  margin-top: calc(var(--spacing-1) * -1);
+  margin-bottom: var(--spacing-2);
+}
+
+.strengthLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-1);
+}
+
+.strengthBar {
+  height: 4px;
+  background-color: var(--color-neutral-200);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-1);
+}
+
+.strengthFill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strengthFill.weak {
+  width: 33%;
+  background-color: var(--color-error);
+}
+
+.strengthFill.medium {
+  width: 66%;
+  background-color: var(--color-warning);
+}
+
+.strengthFill.strong {
+  width: 100%;
+  background-color: var(--color-success);
+}
+
+.strengthText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.strengthText.weak {
+  color: var(--color-error);
+}
+
+.strengthText.medium {
+  color: var(--color-warning);
+}
+
+.strengthText.strong {
+  color: var(--color-success);
+}
+
+.submitButton {
+  margin-top: var(--spacing-2);
+}
+
+.footer {
+  text-align: center;
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.footerText {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.footerLink {
+  color: var(--color-primary-500);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color 0.2s ease;
+}
+
+.footerLink:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+}
+
+.passwordRequirements {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+  padding-left: var(--spacing-3);
+}
+
+.passwordRequirements li {
+  margin-bottom: var(--spacing-1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .signup {
+    padding: var(--spacing-2);
+  }
+
+  .card {
+    padding: var(--spacing-6);
+  }
+
+  .title {
+    font-size: var(--font-size-2xl);
+  }
+}

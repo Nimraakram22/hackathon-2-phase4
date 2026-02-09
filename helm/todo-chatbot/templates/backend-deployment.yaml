@@ -1,0 +1,184 @@
+{{/*
+Backend Deployment Template
+
+This template creates a Kubernetes Deployment for the FastAPI backend service.
+
+Key Features:
+- Configurable replicas for scaling (default: 1 for local, 3+ for production)
+- Rolling update strategy for zero-downtime deployments
+- Resource limits to prevent resource exhaustion
+- Health probes for automatic recovery (liveness) and traffic routing (readiness)
+- Persistent storage for SQLite session database
+- Environment variables from ConfigMap (non-sensitive) and Secret (sensitive)
+- Security context: runs as non-root user (UID 1001)
+
+Template Variables:
+- .Values.backend.replicas: Number of pod replicas
+- .Values.backend.image: Container image name
+- .Values.backend.tag: Container image tag
+- .Values.backend.resources: CPU and memory limits
+- .Values.backend.persistence: PVC configuration for SQLite database
+- .Values.strategy: Rolling update strategy (maxSurge, maxUnavailable)
+
+Health Probes:
+- Liveness: Checks if container is alive (restarts if fails)
+- Readiness: Checks if container is ready to serve traffic (removes from load balancer if fails)
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-chatbot.fullname" . }}-backend
+  labels:
+    {{- include "todo-chatbot.backend.labels" . | nindent 4 }}
+spec:
+  # Number of pod replicas (1 for local, 3+ for production high availability)
+  replicas: {{ .Values.backend.replicas }}
+
+  # Selector must match pod template labels
+  selector:
+    matchLabels:
+      {{- include "todo-chatbot.backend.selectorLabels" . | nindent 6 }}
+
+  # Rolling update strategy for zero-downtime deployments
+  # maxSurge: 1 allows one extra pod during update
+  # maxUnavailable: 1 ensures at least one pod is always running
+  strategy:
+    {{- toYaml .Values.strategy | nindent 4 }}
+
+  # Pod template
+  template:
+    metadata:
+      labels:
+        {{- include "todo-chatbot.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      # Pod-level security context
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+
+      containers:
+      - name: backend
+        # Container image from values.yaml (e.g., todo-chatbot-backend:1.0.0)
+        image: "{{ .Values.backend.image }}:{{ .Values.backend.tag }}"
+        imagePullPolicy: {{ .Values.backend.pullPolicy }}
+
+        # Expose port 8000 for FastAPI
+        ports:
+        - name: http
+          containerPort: {{ .Values.backend.port }}
+          protocol: TCP
+
+        # Environment variables
+        # Sensitive values (credentials) from Secret
+        # Non-sensitive values (configuration) from ConfigMap
+        env:
+        # Database connection string (from Secret)
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-secret
+              key: DATABASE_URL
+
+        # Google Gemini API key for AI agent (from Secret)
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-secret
+              key: GEMINI_API_KEY
+
+        # JWT Secret Key for authentication (from Secret)
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-secret
+              key: JWT_SECRET_KEY
+
+        # Neon database API key (from Secret)
+        - name: NEON_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-secret
+              key: NEON_API_KEY
+
+        # Log level for application logging (from ConfigMap)
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "todo-chatbot.fullname" . }}-config
+              key: LOG_LEVEL
+
+        # Application environment variables
+        - name: ENVIRONMENT
+          value: "{{ .Values.environment | default "production" }}"
+
+        - name: JWT_ALGORITHM
+          value: "HS256"
+
+        - name: JWT_EXPIRATION_MINUTES
+          value: "1440"
+
+        - name: CORS_ORIGINS
+          value: "{{ .Values.corsOrigins | default "http://localhost:5173,http://localhost:3000,http://localhost:8080" }}"
+
+        # Agent session configuration
+        - name: AGENT_SESSION_DB_PATH
+          value: "{{ .Values.backend.persistence.mountPath }}/agent_sessions.db"
+
+        - name: AGENT_SESSION_MAX_MESSAGES
+          value: "200"
+
+        - name: AGENT_SESSION_RETENTION_DAYS
+          value: "7"
+
+        - name: AGENT_SESSION_CLEANUP_HOUR
+          value: "2"
+
+        - name: CONVERSATION_RETENTION_DAYS
+          value: "30"
+
+        # SQLite database path for session storage (mounted from PVC)
+        - name: SQLITE_DB_PATH
+          value: "{{ .Values.backend.persistence.mountPath }}/sessions.db"
+
+        # Mount persistent volume for SQLite database (if enabled)
+        # This ensures session data persists across pod restarts
+        {{- if .Values.backend.persistence.enabled }}
+        volumeMounts:
+        - name: backend-data
+          mountPath: {{ .Values.backend.persistence.mountPath }}
+        {{- end }}
+
+        # Liveness probe: Checks if container is alive
+        # If fails, Kubernetes restarts the container
+        # Uses /health endpoint which checks application and database connectivity
+        livenessProbe:
+          {{- toYaml .Values.backend.livenessProbe | nindent 10 }}
+
+        # Readiness probe: Checks if container is ready to serve traffic
+        # If fails, Kubernetes removes pod from service endpoints
+        # Uses /health endpoint which checks application and database connectivity
+        readinessProbe:
+          {{- toYaml .Values.backend.readinessProbe | nindent 10 }}
+
+        # Resource limits prevent resource exhaustion and enable proper scheduling
+        # Requests: Guaranteed resources (used for scheduling)
+        # Limits: Maximum resources (container throttled/killed if exceeded)
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+
+        # Container-level security context
+        # runAsNonRoot: Prevents running as root user (security best practice)
+        # runAsUser: 1001 (app user created in Dockerfile)
+        # allowPrivilegeEscalation: Prevents gaining additional privileges
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001  # app user
+          allowPrivilegeEscalation: false
+
+      # Volumes section: Define volumes to be mounted into containers
+      # PersistentVolumeClaim provides persistent storage for SQLite database
+      {{- if .Values.backend.persistence.enabled }}
+      volumes:
+      - name: backend-data
+        persistentVolumeClaim:
+          claimName: {{ include "todo-chatbot.fullname" . }}-backend-data
+      {{- end }}

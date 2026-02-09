@@ -1,0 +1,316 @@
+/* Chat Interface Styles */
+
+.chatInterface {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-primary);
+}
+
+/* Header */
+.header {
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+/* Messages */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-8);
+  margin-top: var(--spacing-12);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-4);
+}
+
+.emptyTitle {
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-primary);
+}
+
+.emptyDescription {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+  max-width: 500px;
+}
+
+.suggestions {
+  padding: var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--color-border-primary);
+  max-width: 400px;
+}
+
+.suggestionsTitle {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.suggestionsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  text-align: left;
+}
+
+.suggestionsList li {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-2);
+  background-color: var(--color-bg-tertiary);
+  border-radius: 6px;
+}
+
+.suggestionsList li::before {
+  content: '💡';
+  margin-right: var(--spacing-2);
+}
+
+/* Message Wrapper */
+.messageWrapper {
+  display: flex;
+  margin-bottom: var(--spacing-2);
+}
+
+.userMessage {
+  justify-content: flex-end;
+}
+
+.assistantMessage {
+  justify-content: flex-start;
+}
+
+/* Message Content */
+.messageContent {
+  max-width: 70%;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.userMessage .messageContent {
+  background-color: var(--color-primary-600);
+  color: var(--color-text-inverse);
+}
+
+.assistantMessage .messageContent {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.messageText {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: var(--line-height-relaxed);
+}
+
+.userMessage .messageText {
+  color: var(--color-text-inverse);
+}
+
+.messageTime {
+  opacity: 0.7;
+  font-size: var(--font-size-xs);
+}
+
+.userMessage .messageTime {
+  color: var(--color-text-inverse);
+  text-align: right;
+}
+
+.assistantMessage .messageTime {
+  color: var(--color-text-tertiary);
+}
+
+/* Loading Indicator */
+.loadingIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  justify-content: center;
+}
+
+.loadingText {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Error Message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error);
+  border-radius: 8px;
+  margin-top: var(--spacing-2);
+}
+
+.errorIcon {
+  font-size: var(--font-size-lg);
+  color: var(--color-error);
+}
+
+.errorText {
+  color: var(--color-error);
+}
+
+/* Input Container */
+.inputContainer {
+  padding: var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-primary);
+  position: sticky;
+  bottom: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: var(--spacing-2);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.input {
+  flex: 1;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  border: 2px solid var(--color-border-primary);
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 48px;
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-border-secondary);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.input:disabled {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sendButton {
+  min-width: 100px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  .messages {
+    padding: var(--spacing-3);
+  }
+
+  .messageContent {
+    max-width: 85%;
+  }
+
+  .emptyState {
+    padding: var(--spacing-6);
+    margin-top: var(--spacing-8);
+  }
+
+  .emptyIcon {
+    font-size: 48px;
+  }
+
+  .emptyTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .suggestions {
+    max-width: 100%;
+  }
+
+  .inputContainer {
+    padding: var(--spacing-3);
+  }
+
+  .inputWrapper {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .sendButton {
+    width: 100%;
+  }
+}
+
+/* Scrollbar Styling */
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-400);
+  border-radius: 4px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-500);
+}

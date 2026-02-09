@@ -1,0 +1,391 @@
+openapi: 3.1.0
+info:
+  title: Agentic Todo - Contact API
+  description: API endpoint for contact form submissions with status tracking
+  version: 1.0.0
+  contact:
+    name: Agentic Todo Support
+    email: support@agentic-todo.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.agentic-todo.com
+    description: Production server
+
+paths:
+  /api/contact:
+    post:
+      summary: Create contact form submission
+      description: |
+        Submit a contact form with name, email, subject, and message.
+        Returns submission ID and status. Sends email notification to support team.
+      operationId: createContactSubmission
+      tags:
+        - Contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactSubmissionCreate'
+            examples:
+              bugReport:
+                summary: Bug Report
+                value:
+                  name: John Doe
+                  email: john.doe@example.com
+                  subject: Bug Report
+                  message: I found a bug when trying to create a task with special characters. The app crashes when I use emojis in the task title.
+              featureRequest:
+                summary: Feature Request
+                value:
+                  name: Jane Smith
+                  email: jane.smith@example.com
+                  subject: Feature Request
+                  message: It would be great to have a dark mode option for the chat interface. Many users prefer dark themes for extended use.
+      responses:
+        '201':
+          description: Contact submission created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactSubmissionResponse'
+              example:
+                id: 123
+                name: John Doe
+                email: john.doe@example.com
+                subject: Bug Report
+                message: I found a bug when trying to create a task with special characters.
+                status: new
+                created_at: '2026-01-31T10:30:00Z'
+        '400':
+          description: Validation error - invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                detail:
+                  - type: string_too_short
+                    loc: ['body', 'message']
+                    msg: Message must be at least 10 characters
+                    input: Too short
+        '422':
+          description: Unprocessable entity - validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '429':
+          description: Rate limit exceeded - too many submissions from this IP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Rate limit exceeded. Maximum 5 submissions per hour per IP address.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Internal server error. Please try again later.
+
+    get:
+      summary: List contact submissions (Admin only)
+      description: |
+        Retrieve paginated list of contact submissions with filtering by status.
+        Requires admin authentication.
+      operationId: listContactSubmissions
+      tags:
+        - Contact
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by submission status
+          required: false
+          schema:
+            $ref: '#/components/schemas/SubmissionStatus'
+        - name: skip
+          in: query
+          description: Number of records to skip (pagination)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of contact submissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContactSubmissionAdmin'
+                  total:
+                    type: integer
+                    description: Total number of submissions matching filter
+                  skip:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Unauthorized - missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/contact/{id}:
+    patch:
+      summary: Update contact submission (Admin only)
+      description: |
+        Update status, assigned_to, or response_sent fields for a contact submission.
+        Requires admin authentication.
+      operationId: updateContactSubmission
+      tags:
+        - Contact
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Contact submission ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactSubmissionUpdate'
+      responses:
+        '200':
+          description: Contact submission updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactSubmissionAdmin'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Contact submission not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    ContactSubmissionCreate:
+      type: object
+      required:
+        - name
+        - email
+        - subject
+        - message
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Submitter's full name
+          example: John Doe
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Submitter's email address
+          example: john.doe@example.com
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Subject or category of the submission
+          example: Bug Report
+          enum:
+            - Bug Report
+            - Feature Request
+            - General Question
+            - Feedback
+        message:
+          type: string
+          minLength: 10
+          maxLength: 5000
+          description: Detailed message content
+          example: I found a bug when trying to create a task with special characters.
+
+    ContactSubmissionResponse:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - subject
+        - message
+        - status
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Unique submission identifier
+          example: 123
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        subject:
+          type: string
+          example: Bug Report
+        message:
+          type: string
+          example: I found a bug when trying to create a task with special characters.
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of submission
+          example: '2026-01-31T10:30:00Z'
+
+    ContactSubmissionAdmin:
+      allOf:
+        - $ref: '#/components/schemas/ContactSubmissionResponse'
+        - type: object
+          properties:
+            assigned_to:
+              type: string
+              nullable: true
+              description: Email or ID of assigned support team member
+              example: support@agentic-todo.com
+            response_sent:
+              type: boolean
+              description: Whether response has been sent to submitter
+              example: false
+            updated_at:
+              type: string
+              format: date-time
+              description: ISO 8601 timestamp of last update
+              example: '2026-01-31T11:00:00Z'
+            ip_address:
+              type: string
+              nullable: true
+              description: Submitter's IP address
+              example: 192.168.1.1
+            user_agent:
+              type: string
+              nullable: true
+              description: Submitter's browser user agent
+              example: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+
+    ContactSubmissionUpdate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
+        assigned_to:
+          type: string
+          nullable: true
+          maxLength: 255
+        response_sent:
+          type: boolean
+
+    SubmissionStatus:
+      type: string
+      enum:
+        - new
+        - in-progress
+        - resolved
+        - closed
+      description: |
+        Workflow status of the submission:
+        - new: Just submitted, not yet reviewed
+        - in-progress: Being worked on by support team
+        - resolved: Issue resolved, response sent
+        - closed: Submission closed (resolved or no action needed)
+      example: new
+
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Error type
+              loc:
+                type: array
+                items:
+                  oneOf:
+                    - type: string
+                    - type: integer
+                description: Location of the error in the request
+              msg:
+                type: string
+                description: Human-readable error message
+              input:
+                description: The input value that caused the error
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: Internal server error
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/auth/login endpoint
+
+tags:
+  - name: Contact
+    description: Contact form submission endpoints
+  - name: Admin
+    description: Admin-only endpoints for managing submissions

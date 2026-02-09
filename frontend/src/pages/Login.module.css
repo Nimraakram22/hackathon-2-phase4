@@ -1,0 +1,116 @@
+/* Login Page Styles */
+
+.login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-primary);
+  padding: var(--spacing-4);
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.card {
+  padding: var(--spacing-8);
+  background-color: var(--color-bg-secondary);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.title {
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.rememberMeContainer {
+  margin-top: calc(var(--spacing-2) * -1);
+  margin-bottom: var(--spacing-2);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-primary-500);
+}
+
+.checkboxText {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.rememberMeHelp {
+  margin-top: var(--spacing-1);
+  margin-left: calc(20px + var(--spacing-2));
+  color: var(--color-text-tertiary);
+}
+
+.submitButton {
+  margin-top: var(--spacing-2);
+}
+
+.footer {
+  text-align: center;
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.footerText {
+  color: var(--color-text-secondary);
+}
+
+.footerLink {
+  color: var(--color-primary-500);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color 0.2s ease;
+}
+
+.footerLink:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .login {
+    padding: var(--spacing-2);
+  }
+
+  .card {
+    padding: var(--spacing-6);
+  }
+
+  .title {
+    font-size: var(--font-size-2xl);
+  }
+}

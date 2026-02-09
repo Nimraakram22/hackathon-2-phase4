@@ -1,0 +1,191 @@
+/* Grid System - 12/8/4 Columns for Desktop/Tablet/Mobile */
+:root {
+  /* Grid Configuration */
+  --grid-columns-desktop: 12;
+  --grid-columns-tablet: 8;
+  --grid-columns-mobile: 4;
+
+  /* Grid Gutter */
+  --grid-gutter: var(--spacing-3); /* 24px */
+
+  /* Container Max Widths */
+  --container-max-width-sm: 640px;
+  --container-max-width-md: 768px;
+  --container-max-width-lg: 1024px;
+  --container-max-width-xl: 1280px;
+  --container-max-width-2xl: 1536px;
+
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: var(--container-max-width-sm);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: var(--container-max-width-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: var(--container-max-width-lg);
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: var(--container-max-width-xl);
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: var(--container-max-width-2xl);
+  }
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  gap: var(--grid-gutter);
+}
+
+/* Mobile: 4 columns (default) */
+.grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Tablet: 8 columns */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+/* Desktop: 12 columns */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+/* Column Span Utilities - Mobile (4 columns) */
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-full { grid-column: 1 / -1; }
+
+/* Column Span Utilities - Tablet (8 columns) */
+@media (min-width: 768px) {
+  .md\\:col-span-1 { grid-column: span 1; }
+  .md\\:col-span-2 { grid-column: span 2; }
+  .md\\:col-span-3 { grid-column: span 3; }
+  .md\\:col-span-4 { grid-column: span 4; }
+  .md\\:col-span-5 { grid-column: span 5; }
+  .md\\:col-span-6 { grid-column: span 6; }
+  .md\\:col-span-7 { grid-column: span 7; }
+  .md\\:col-span-8 { grid-column: span 8; }
+  .md\\:col-span-full { grid-column: 1 / -1; }
+}
+
+/* Column Span Utilities - Desktop (12 columns) */
+@media (min-width: 1024px) {
+  .lg\\:col-span-1 { grid-column: span 1; }
+  .lg\\:col-span-2 { grid-column: span 2; }
+  .lg\\:col-span-3 { grid-column: span 3; }
+  .lg\\:col-span-4 { grid-column: span 4; }
+  .lg\\:col-span-5 { grid-column: span 5; }
+  .lg\\:col-span-6 { grid-column: span 6; }
+  .lg\\:col-span-7 { grid-column: span 7; }
+  .lg\\:col-span-8 { grid-column: span 8; }
+  .lg\\:col-span-9 { grid-column: span 9; }
+  .lg\\:col-span-10 { grid-column: span 10; }
+  .lg\\:col-span-11 { grid-column: span 11; }
+  .lg\\:col-span-12 { grid-column: span 12; }
+  .lg\\:col-span-full { grid-column: 1 / -1; }
+}
+
+/* Flexbox Utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+/* Responsive Display Utilities */
+.hidden {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .md\\:block {
+    display: block;
+  }
+
+  .md\\:hidden {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\\:block {
+    display: block;
+  }
+
+  .lg\\:hidden {
+    display: none;
+  }
+}

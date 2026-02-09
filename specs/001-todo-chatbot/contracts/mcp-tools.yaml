@@ -1,0 +1,405 @@
+openapi: 3.1.0
+info:
+  title: Todo MCP Tools
+  description: MCP tool schemas for AI-powered todo chatbot task management operations
+  version: 0.1.0
+  contact:
+    name: Todo Chatbot Team
+
+servers:
+  - url: mcp://todo-server
+    description: FastMCP server for task management tools
+
+paths:
+  /tools/create_task:
+    post:
+      operationId: create_task
+      summary: Create a new task
+      description: Creates a new task for the authenticated user with title and optional description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - title
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  description: Task title (1-100 characters)
+                description:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                  description: Optional task description (max 1000 characters)
+      responses:
+        '200':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - task_id
+                  - title
+                  - is_completed
+                  - created_at
+                properties:
+                  task_id:
+                    type: string
+                    format: uuid
+                    description: Unique task identifier
+                  title:
+                    type: string
+                    description: Task title
+                  description:
+                    type: string
+                    nullable: true
+                    description: Task description
+                  is_completed:
+                    type: boolean
+                    description: Completion status (always false for new tasks)
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Task creation timestamp
+        '400':
+          description: Invalid input (title too long, empty title, etc.)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+  /tools/list_tasks:
+    post:
+      operationId: list_tasks
+      summary: List user's tasks
+      description: Retrieves tasks for the authenticated user with optional filtering by completion status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                status_filter:
+                  type: string
+                  enum: [all, pending, completed]
+                  default: all
+                  description: Filter tasks by completion status
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  default: 50
+                  description: Maximum number of tasks to return
+                offset:
+                  type: integer
+                  minimum: 0
+                  default: 0
+                  description: Number of tasks to skip (for pagination)
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tasks
+                  - total_count
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - task_id
+                        - title
+                        - is_completed
+                        - created_at
+                      properties:
+                        task_id:
+                          type: string
+                          format: uuid
+                        title:
+                          type: string
+                        description:
+                          type: string
+                          nullable: true
+                        is_completed:
+                          type: boolean
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                        completed_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                  total_count:
+                    type: integer
+                    description: Total number of tasks matching filter
+        '400':
+          description: Invalid input (invalid user_id, invalid status_filter, etc.)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+  /tools/complete_task:
+    post:
+      operationId: complete_task
+      summary: Mark task as completed
+      description: Marks a task as completed and sets the completion timestamp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - task_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                task_id:
+                  type: string
+                  format: uuid
+                  description: Task identifier (UUID)
+      responses:
+        '200':
+          description: Task marked as completed
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - task_id
+                  - is_completed
+                  - completed_at
+                properties:
+                  task_id:
+                    type: string
+                    format: uuid
+                  is_completed:
+                    type: boolean
+                    description: Completion status (always true)
+                  completed_at:
+                    type: string
+                    format: date-time
+                    description: Completion timestamp
+        '404':
+          description: Task not found or does not belong to user
+        '400':
+          description: Invalid input (invalid UUIDs)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+  /tools/update_task:
+    post:
+      operationId: update_task
+      summary: Update task details
+      description: Updates task title and/or description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - task_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                task_id:
+                  type: string
+                  format: uuid
+                  description: Task identifier (UUID)
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  nullable: true
+                  description: New task title (optional)
+                description:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+                  description: New task description (optional)
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - task_id
+                  - title
+                  - updated_at
+                properties:
+                  task_id:
+                    type: string
+                    format: uuid
+                  title:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: Task not found or does not belong to user
+        '400':
+          description: Invalid input (title too long, no fields to update, etc.)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+  /tools/delete_task:
+    post:
+      operationId: delete_task
+      summary: Delete task permanently
+      description: Permanently deletes a task (hard delete per spec requirement)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - task_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                task_id:
+                  type: string
+                  format: uuid
+                  description: Task identifier (UUID)
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - task_id
+                  - deleted
+                properties:
+                  task_id:
+                    type: string
+                    format: uuid
+                  deleted:
+                    type: boolean
+                    description: Deletion confirmation (always true)
+        '404':
+          description: Task not found or does not belong to user
+        '400':
+          description: Invalid input (invalid UUIDs)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+  /tools/get_task:
+    post:
+      operationId: get_task
+      summary: Get task by ID
+      description: Retrieves a single task by its identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - task_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: User identifier (UUID)
+                task_id:
+                  type: string
+                  format: uuid
+                  description: Task identifier (UUID)
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - task_id
+                  - title
+                  - is_completed
+                  - created_at
+                properties:
+                  task_id:
+                    type: string
+                    format: uuid
+                  title:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  is_completed:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  completed_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '404':
+          description: Task not found or does not belong to user
+        '400':
+          description: Invalid input (invalid UUIDs)
+        '500':
+          description: Database error (retried with exponential backoff)
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+          nullable: true

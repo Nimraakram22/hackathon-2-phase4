@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["frontend", "backend"],
+  "properties": {
+    "frontend": {
+      "type": "object",
+      "required": ["image", "tag", "replicas", "port"],
+      "properties": {
+        "image": {
+          "type": "string",
+          "description": "Frontend container image name"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Frontend container image tag"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "description": "Image pull policy"
+        },
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of frontend replicas"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Frontend container port"
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "memory": {"type": "string"},
+                "cpu": {"type": "string"}
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "memory": {"type": "string"},
+                "cpu": {"type": "string"}
+              }
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+            },
+            "port": {"type": "integer"},
+            "targetPort": {"type": "integer"}
+          }
+        }
+      }
+    },
+    "backend": {
+      "type": "object",
+      "required": ["image", "tag", "replicas", "port"],
+      "properties": {
+        "image": {
+          "type": "string",
+          "description": "Backend container image name"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Backend container image tag"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "description": "Image pull policy"
+        },
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of backend replicas"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Backend container port"
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "memory": {"type": "string"},
+                "cpu": {"type": "string"}
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "memory": {"type": "string"},
+                "cpu": {"type": "string"}
+              }
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+            },
+            "port": {"type": "integer"},
+            "targetPort": {"type": "integer"}
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "storageClass": {"type": "string"},
+            "accessMode": {
+              "type": "string",
+              "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadOnlyMany"]
+            },
+            "size": {"type": "string"},
+            "mountPath": {"type": "string"}
+          }
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "backendApiUrl": {"type": "string"},
+        "frontendUrl": {"type": "string"},
+        "logLevel": {
+          "type": "string",
+          "enum": ["debug", "info", "warning", "error"]
+        }
+      }
+    },
+    "secret": {
+      "type": "object",
+      "properties": {
+        "databaseUrl": {"type": "string"},
+        "openaiApiKey": {"type": "string"},
+        "neonApiKey": {"type": "string"}
+      }
+    }
+  }
+}

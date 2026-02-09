@@ -1,0 +1,57 @@
+/* Spinner Component Styles */
+
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.svg {
+  display: block;
+}
+
+.circle {
+  opacity: 0.25;
+}
+
+.path {
+  opacity: 0.75;
+}
+
+/* Sizes */
+.sm {
+  width: 16px;
+  height: 16px;
+}
+
+.md {
+  width: 24px;
+  height: 24px;
+}
+
+.lg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Screen reader only text */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

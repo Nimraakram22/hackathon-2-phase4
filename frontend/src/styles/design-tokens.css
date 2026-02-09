@@ -1,0 +1,77 @@
+/* Design Tokens - Color Variables */
+:root {
+  /* Neutral Colors (60% - backgrounds, borders, text) */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #1a1a1a;
+
+  /* Primary Brand Color (30% - brand elements, secondary CTAs) */
+  /* AI-Forward Purple - conveys innovation and modern technology */
+  --color-primary-50: #faf5ff;
+  --color-primary-100: #f3e8ff;
+  --color-primary-200: #e9d5ff;
+  --color-primary-300: #d8b4fe;
+  --color-primary-400: #c084fc;
+  --color-primary-500: #a855f7;
+  --color-primary-600: #9333ea;
+  --color-primary-700: #7c3aed;
+  --color-primary-800: #6b21a8;
+  --color-primary-900: #581c87;
+
+  /* Accent Color (10% - primary CTAs, important actions) */
+  /* Amber - high contrast for call-to-action elements */
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fef3c7;
+  --color-accent-200: #fde68a;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent-700: #b45309;
+  --color-accent-800: #92400e;
+  --color-accent-900: #78350f;
+
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-info: #7c3aed;
+  --color-info-light: #f3e8ff;
+
+  /* Text Colors */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-inverse: var(--color-neutral-50);
+
+  /* Background Colors */
+  --color-bg-primary: var(--color-neutral-50);
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: var(--color-neutral-100);
+
+  /* Border Colors */
+  --color-border-primary: var(--color-neutral-200);
+  --color-border-secondary: var(--color-neutral-300);
+  --color-border-focus: var(--color-primary-600);
+
+  /* Interactive States */
+  --color-hover-overlay: rgba(124, 58, 237, 0.08);
+  --color-active-overlay: rgba(124, 58, 237, 0.12);
+  --color-focus-ring: rgba(124, 58, 237, 0.3);
+}
+
+/* 60-30-10 Rule Application:
+ * - 60% Neutrals: Backgrounds, text, borders
+ * - 30% Primary: Brand elements, secondary CTAs, links
+ * - 10% Accent: Primary CTAs, important actions, highlights
+ */

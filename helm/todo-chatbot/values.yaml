@@ -1,0 +1,123 @@
+# Default values for todo-chatbot Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Frontend configuration
+frontend:
+  image: todo-chatbot-frontend
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8080
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  livenessProbe:
+    httpGet:
+      path: /health.html
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health.html
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 8080
+    nodePort: 30080  # Fixed port for consistent access
+
+# Backend configuration
+backend:
+  image: todo-chatbot-backend
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8000
+
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  # Persistent storage for SQLite session database
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 1Gi  # Sufficient for SQLite session storage
+    mountPath: /app/data
+
+# ConfigMap data (non-sensitive configuration)
+config:
+  backendApiUrl: "http://backend:8000"
+  frontendUrl: "http://localhost:8080"
+  logLevel: "info"
+
+# Secret data (sensitive configuration)
+# Note: These are placeholders. Actual values should be provided via --set or separate values file
+# or created manually with kubectl create secret
+secret:
+  # Base64 encoded values will be created from these
+  databaseUrl: ""  # postgresql://user:password@host:5432/database
+  geminiApiKey: ""  # your-gemini-api-key
+  jwtSecretKey: ""  # generate-with-openssl-rand-hex-32
+  neonApiKey: ""    # neon-api-key
+
+# Common labels
+labels:
+  app: todo-chatbot
+  version: "1.0.0"
+
+# Security context (pod-level)
+securityContext:
+  runAsNonRoot: true
+  # Note: allowPrivilegeEscalation is container-level, defined in deployment templates
+
+# Rolling update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1

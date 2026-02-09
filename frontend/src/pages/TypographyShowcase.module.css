@@ -1,0 +1,119 @@
+/* Typography Showcase Page Styles */
+
+.showcase {
+  background-color: var(--color-bg-primary);
+  min-height: 100vh;
+  padding: var(--spacing-8) 0;
+}
+
+.container {
+  max-width: var(--container-max-width-lg);
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+.pageTitle {
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-primary);
+}
+
+.pageDescription {
+  margin-bottom: var(--spacing-8);
+  color: var(--color-text-secondary);
+  max-width: 65ch;
+}
+
+.section {
+  margin-bottom: var(--spacing-8);
+}
+
+.headingExamples,
+.textExamples,
+.weightExamples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.example {
+  padding: var(--spacing-4);
+  border-left: 3px solid var(--color-primary-500);
+  background-color: var(--color-bg-secondary);
+}
+
+.meta {
+  margin-top: var(--spacing-2);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+.readabilityTest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  max-width: 65ch;
+}
+
+.readabilityTest h3 {
+  margin-top: var(--spacing-6);
+  margin-bottom: var(--spacing-3);
+}
+
+.readabilityTest h4 {
+  margin-top: var(--spacing-4);
+  margin-bottom: var(--spacing-2);
+}
+
+.contrastExamples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.contrastBox {
+  padding: var(--spacing-6);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-primary);
+}
+
+.responsiveGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.responsiveGuide h4 {
+  margin-top: var(--spacing-4);
+  margin-bottom: var(--spacing-2);
+  color: var(--color-primary-500);
+}
+
+.testingInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.testingInstructions h4 {
+  margin-bottom: var(--spacing-3);
+  color: var(--color-text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .showcase {
+    padding: var(--spacing-6) 0;
+  }
+
+  .pageTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .contrastExamples {
+    grid-template-columns: 1fr;
+  }
+
+  .example {
+    padding: var(--spacing-3);
+  }
+}

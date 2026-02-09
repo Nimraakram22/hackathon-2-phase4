@@ -1,0 +1,72 @@
+/* Features Section Styles */
+
+.features {
+  background-color: var(--color-bg-secondary);
+  padding: var(--spacing-12) 0;
+}
+
+.container {
+  max-width: var(--container-max-width-xl);
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+.sectionTitle {
+  text-align: center;
+  margin-bottom: var(--spacing-8);
+  color: var(--color-text-primary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.featureCard {
+  text-align: center;
+  padding: var(--spacing-6);
+}
+
+.icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-50);
+  border-radius: 12px;
+  color: var(--color-primary-500);
+}
+
+.icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.featureTitle {
+  margin-bottom: var(--spacing-2);
+  color: var(--color-text-primary);
+}
+
+.featureDescription {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .features {
+    padding: var(--spacing-8) 0;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .featureCard {
+    padding: var(--spacing-4);
+  }
+}

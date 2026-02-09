@@ -1,0 +1,119 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: todo-chatbot
+
+# Build configuration
+build:
+  # Use local Docker daemon (Minikube's Docker)
+  local:
+    push: false
+    useBuildkit: true
+    concurrency: 2
+
+  artifacts:
+    # Backend artifact
+    - image: todo-chatbot-backend
+      context: backend
+      docker:
+        dockerfile: Dockerfile.dev
+        buildArgs:
+          ENVIRONMENT: development
+      sync:
+        manual:
+          # Sync Python files without rebuilding
+          - src: "src/**/*.py"
+            dest: /app/src
+          - src: "requirements.txt"
+            dest: /app
+
+    # Frontend artifact
+    - image: todo-chatbot-frontend
+      context: frontend
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          # Sync source files for Vite HMR
+          - src: "src/**/*"
+            dest: /app/src
+          - src: "public/**/*"
+            dest: /app/public
+          - src: "index.html"
+            dest: /app
+          - src: "vite.config.ts"
+            dest: /app
+
+# Deploy configuration
+deploy:
+  helm:
+    releases:
+      - name: todo-chatbot
+        chartPath: helm/todo-chatbot
+        namespace: default
+        createNamespace: false
+        wait: true
+        recreatePods: false
+        skipBuildDependencies: false
+        upgradeOnChange: true
+        setValueTemplates:
+          # Use development image tags
+          backend.image: todo-chatbot-backend
+          backend.tag: latest
+          backend.pullPolicy: IfNotPresent
+          frontend.image: todo-chatbot-frontend
+          frontend.tag: latest
+          frontend.pullPolicy: IfNotPresent
+        setValues:
+          # Development-specific values
+          backend.replicas: 1
+          frontend.replicas: 1
+        valuesFiles:
+          - helm/todo-chatbot/values.yaml
+          - helm/todo-chatbot/values-dev.yaml
+
+# Port forwarding for local access
+portForward:
+  - resourceType: service
+    resourceName: todo-chatbot-frontend
+    namespace: default
+    port: 80
+    localPort: 8080
+  - resourceType: service
+    resourceName: todo-chatbot-backend
+    namespace: default
+    port: 8000
+    localPort: 8000
+
+# File watching configuration
+profiles:
+  # Development profile (default)
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      local:
+        push: false
+        useBuildkit: true
+    deploy:
+      helm:
+        releases:
+          - name: todo-chatbot
+            chartPath: helm/todo-chatbot
+            setValues:
+              backend.replicas: 1
+              frontend.replicas: 1
+
+  # Production profile
+  - name: prod
+    build:
+      local:
+        push: true
+    deploy:
+      helm:
+        releases:
+          - name: todo-chatbot
+            chartPath: helm/todo-chatbot
+            setValues:
+              backend.replicas: 3
+              frontend.replicas: 2
